@@ -4,6 +4,6 @@
 
 * status do ultimo modulo feito: 
 ```bash
-12 Em curso
+12 Finalizado!
 ```
 * data da ultima atualização do repositório: 06/Out/2023
