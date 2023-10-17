@@ -14,10 +14,22 @@ void main() {
   String classificacao = "";
 
   if (preco <= 25) {
-    aumento = preco * (categoria == 1 ? 0.05 : (categoria == 2 ? 0.08 : 0.1));
+    if (categoria == 1) {
+      aumento = preco * 0.05;
+    } else if (categoria == 2) {
+      aumento = preco * 0.08;
+    } else {
+      aumento = preco * 0.1;
+    }
   } else {
-    aumento = preco * (categoria == 1 ? 0.12 : (categoria == 2 ? 0.15 : 0.18));
-
+    if (categoria == 1) {
+      aumento = preco * 0.12;
+    } else if (categoria == 2) {
+      aumento = preco * 0.15;
+    } else {
+      aumento = preco * 0.18;
+    }
+    
     if (categoria == 2 || situacao == "r") {
       calcImpost = preco + aumento;
       imposto = calcImpost * 0.05;
@@ -35,13 +47,6 @@ void main() {
     classificacao = "Normal";
   } else {
     classificacao = "Caro";
-  }
-
-  // Clear the console screen based on the operating system.
-  if (Platform.isWindows) {
-    Process.run('cls', [], runInShell: true);
-  } else {
-    Process.run('clear', [], runInShell: true);
   }
 
   print("O valor do aumento será de R\$ ${aumento.toStringAsFixed(2)}, o valor do imposto será de R\$ ${imposto.toStringAsFixed(2)}, totalizando R\$ ${total.toStringAsFixed(2)}");
