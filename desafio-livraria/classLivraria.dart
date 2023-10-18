@@ -31,10 +31,10 @@ class Livro {
         Livro livro = Livro(id, titulo, preco, estrelas, autor, efavorito);
         livros.add(livro);
       }
-
       return livros;
+
     } else {
-      throw Exception("O arquivo não foi encontrado.");
+      throw Exception("O arquivo não foi encontrado!");
     }
   }
 

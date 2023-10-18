@@ -94,6 +94,20 @@ void listarLivros(int controleLivros, List<Livro> livros) {
 
       break;
     case 6:
+      print("\nLIVROS FAVORITOS: \n");
+      bool valor = false;
+
+      for (var livro in livros) {
+          if (livro.eFavorito == true) {
+          livro.mostrarDetalhes();
+          valor = true;
+        }
+      }
+
+      if (valor == false) {
+        print("Não existe nenhum livro marcado como favorito!");
+      }
+
       break;
     default:
       print("Opção inválida. Digite uma opção válida!");

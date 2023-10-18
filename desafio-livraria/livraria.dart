@@ -1,10 +1,14 @@
+//adicionar na opção 4 a opção para adionar a lista de favoritos inteira.
+//adicinar a pergunta se deseja fechar o pedido antes de fechar.
 import 'dart:io';
 import 'dart:convert';
 import 'classLivraria.dart';
+import 'classSacola.dart';
 import 'listarLivros.dart';
 
 void main() {
   List<Livro> livros = Livro.lerLivrosJson('livraria.json');
+  Sacola sacola = Sacola();
   bool sair = false;
 
   while (!sair) {
@@ -12,14 +16,18 @@ void main() {
     print("-- BEM VINDO A LIVRARIA DO RODRIGO, ESCOLHA UMA DAS SEGUINTES OPÇÕES PARA CONTINUAR: --");
     print("----- 1 - LISTAR LIVROS ---------------------------------------------------------------");
     print("----- 2 - MARCAR LIVROS COMO FAVORITOS ------------------------------------------------");
-    print("----- 3 - ADICIONAR LIVROS NA SACOLA --------------------------------------------------");
-    print("----- 4 - VISUALIZAR ITENS NA SACOLA --------------------------------------------------");
-    print("----- 5 - FECHAR PEDIDO ---------------------------------------------------------------");
+    print("----- 3 - DESMARCAR LIVROS COMO FAVORITOS ---------------------------------------------");
+    print("----- 4 - ADICIONAR LIVROS E/OU LISTA DE FAVORITOS NA SACOLA --------------------------");
+    print("----- 5 - VISUALIZAR ITENS NA SACOLA --------------------------------------------------");
+    print("----- 6 - EXCLUIR ITENS DA SACOLA -----------------------------------------------------");
+    print("----- 7 - FECHAR PEDIDO ---------------------------------------------------------------");
     print("----- 0 - ENCERRAR O SISTEMA ----------------------------------------------------------");
     print("---------------------------------------------------------------------------------------");
 
     stdout.write("Digite a opção desejada: ");
-    int controle = int.parse(stdin.readLineSync()!);
+    // TryParse verifica se a entrada é valida caso não for retornal null.
+    // A segunda parte do operador ?? é usada para definir um valor padrão de -1 se a análise não for bem-sucedida. 
+    int controle = int.tryParse(stdin.readLineSync() ?? "") ?? -1;
 
     switch (controle) {
       case 1: //Listar livros
@@ -35,15 +43,24 @@ void main() {
         print("-------------------------------------------------------------------");
 
         stdout.write("Digite a opção desejada: ");
-        int controleLivros = int.parse(stdin.readLineSync()!);
+        int controleLivros = int.tryParse(stdin.readLineSync() ?? "") ?? -1;
 
         listarLivros(controleLivros, livros);
 
         break;
       case 2: // Marcar livros como favoritos.
-        stdout.write("Digite o(s) ID('s) do(s) livro(s) que você deseja marcar como favorito(s), separados por espaço:");
-        String input = stdin.readLineSync() ?? "";
-        List<int> favoritos = input.split(' ').map((id) => int.parse(id)).toList();
+        print("Digite o(s) ID('s) do(s) livro(s) que você deseja marcar como favorito(s), separados por vírgula:\n");
+        String entrada = stdin.readLineSync() ?? "";
+          
+        // regex para validar a entrada
+        final RegExp regex = RegExp(r'^\d+(,\d+)*$');
+
+        if (!regex.hasMatch(entrada)) {
+          print("Entrada inválida. Certifique-se de digitar IDs válidos separados por vírgula.");
+          break;
+        }
+
+        List<int> favoritos = entrada.split(',').map((id) => int.parse(id)).toList();
 
         // Atualiza a lista de livros marcando os favoritos como true
         for (var i = 0; i < livros.length; i++) {
@@ -75,11 +92,179 @@ void main() {
         arquivo.writeAsStringSync(newJsonContent);
 
         break;
-      case 3: // Adicionar livros a sacola.
+      case 3: // Desmarcar livros como favoritos.
+        listarLivros(6, livros);
+
+        bool valor = false;
+
+        for (var livro in livros) {
+          if (livro.eFavorito == true) {
+            valor = true;
+          }
+        }
+
+        if (valor == true) {
+          print("\nDigite o(s) ID('s) do(s) livro(s) que você deseja marcar como favorito(s), separados por vírgula:\n");
+          String entrada = stdin.readLineSync() ?? "";
+          
+          // regex para validar a entrada
+          final RegExp regex = RegExp(r'^\d+(,\d+)*$');
+
+          if (!regex.hasMatch(entrada)) {
+            print("Entrada inválida. Certifique-se de digitar IDs válidos separados por vírgula.");
+            break;
+          }
+
+          List<int> favoritos = entrada.split(',').map((id) => int.parse(id)).toList();
+
+          // Atualiza a lista de livros marcando os favoritos como true
+          for (var i = 0; i < livros.length; i++) {
+            if (favoritos.contains(livros[i].id)) {
+              livros[i].eFavorito = false;
+            }
+          }
+          
+          // Função para reordenar os livros por ordem antes de gravar novamente no arquivo. 
+          Livro.ordenarLivrosPorID(livros);
+
+          // Atualiza o JSON com os novos valores
+          List<Map<String, dynamic>> livrosJson = [];
+          for (var livro in livros) {
+            livrosJson.add({
+              'id': livro.id,
+              'titulo': livro.titulo,
+              'preco': livro.preco,
+              'estrelas': livro.estrelas,
+              'autor': livro.autor,
+              'favorito': livro.eFavorito,
+            });
+          }
+
+          Map<String, dynamic> jsonMap = {'livros': livrosJson};
+          String newJsonContent = jsonEncode(jsonMap);
+
+          final arquivo = File('livraria.json');
+          arquivo.writeAsStringSync(newJsonContent);
+        } 
+
         break;
-      case 4: // Visualizar sacola.
+      case 4: // Adicionar livros a sacola.
+        print("ADICIONAR LIVROS A SACOLA: ");
+
+        stdout.write("Você deseja adicionar a lista de favoritos na sacola? (digite 1 para 'sim' ou 2 para 'não') ");
+        int repostaFavoritos = int.tryParse(stdin.readLineSync() ?? "") ?? -1;
+
+        if (repostaFavoritos == 1) {
+          
+        } else {
+
+        }
+
+        print("Digite o(s) ID('s) ou o(s) nome(s) do(s) livro(s) que deseja adicionar a sacola separados por vírgula:\n");
+        var idNome = stdin.readLineSync() ?? "";
+
+        List<String> idsNomes = idNome.split(',');
+        bool livroAdicionado = false;
+
+        for (var idNome in idsNomes) {
+          // Rastrear se o livro foi encontrado.
+          bool encontrado = false;
+
+          if (int.tryParse(idNome) != null) {
+            // Se for um ID, vai tentar adicionar pelo ID.
+            int id = int.parse(idNome);
+            if (sacola.adicionarItemPorId(id, livros)) {
+              livroAdicionado = true;
+              encontrado = true;
+            }
+          }
+
+          // Se não for um ID, vai tentar adicionar pelo nome.
+          for (var livro in livros) {
+            if (idNome == livro.titulo) {
+              if (sacola.adicionarItemPorNome(idNome, livros)) {
+                livroAdicionado = true;
+                encontrado = true;
+              }
+            }
+          }
+
+          if (!encontrado) {
+            print("Livro não encontrado: $idNome");
+          }
+        }
+
+        // Verifica se o livro foi adicionado.
+        if (livroAdicionado) {
+          print("Livro(s) adicionado(s) a sacola.");
+        } else {
+          print("Nenhum livro foi encontrado ou adicionado.");
+        }
+
         break;
-      case 5: // Fechar pedido.
+      case 5: // Visualizar sacola.
+        print("\nVISUALIZAR LIVROS NA SACOLA: \n");
+        print('Itens na sacola:');
+        sacola.listarItens();
+
+        break;
+      case 6: // Excluir intens da sacola.
+        print("\nREMOVER LIVROS DA SACOLA: \n");
+
+        print("ITENS ATUALMENTE NA SACOLA:");
+        sacola.listarItens();
+
+        if (sacola.itens.isNotEmpty) {
+          print("Digite o(s) ID(s) ou o(s) nome(s) do(s) livro(s) que deseja remover da sacola separados por vírgula:\n");
+          var idNome = stdin.readLineSync() ?? "";
+
+          List<String> idsNomes = idNome.split(',');
+          bool livroRemovido = false;
+
+          for (var idNome in idsNomes) {
+
+            if (int.tryParse(idNome) != null) {
+              // Se for um ID, vai tentar remover pelo ID.
+              int id = int.parse(idNome);
+              if (sacola.removerItem(id, '')) {
+                livroRemovido = true;
+              }
+            } else {
+              // Se não for um ID, vai tentar remover pelo nome.
+              if (sacola.removerItem(0, idNome)) {
+                livroRemovido = true;
+              }
+            }
+          }
+
+          // Exibe o sacola após as operações.
+          sacola.exibirSacolaRestantes();
+
+          // Verifica se algum livro foi removido.
+          if (livroRemovido) {
+            print("Livros(s) selecionado(s) removido(s) da sacola.");
+          } else {
+            print("Nenhum livro foi encontrado ou removido.");
+          }
+        }
+
+        break;
+      case 7: // Fechar pedido.
+        print("\nFECHAR COMPRAS NA SACOLA: \n");
+
+        if (sacola.itens.isNotEmpty) {
+          double precoTotal = sacola.calcularPrecoTotal();
+
+          print("----------- FECHAMENTO DE COMPRA -----------------");
+          print("Quantidade de itens totais: ${sacola.itens.length}");
+          print("Preço Total dos produtos: R\$ ${precoTotal.toStringAsFixed(2)}");
+          print("Produtos Adquridos: ");
+          print("--------------------------------------------------");
+          sacola.listarItensComprados();
+        } else {
+          print("Nenhum item foi adicionado na sacola para finalizar a compra!");
+        }
+
         break;
       case 0:
         print("Encerrando compras, até a próxima!");

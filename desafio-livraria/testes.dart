@@ -1,56 +1,94 @@
-import 'dart:convert';
+import 'classLivraria.dart';
 import 'dart:io';
 
-class Livro {
-  late int id;
-  late String titulo;
-  late double preco;
-  late double estrelas;
-  late String autor;
-  late bool eFavorito;
+class Sacola {
+  List<Livro> itens = [];
 
-  Livro(this.id, this.titulo, this.preco, this.estrelas, this.autor,
-      this.eFavorito);
-
-  static List<Livro> lerLivrosJson(String caminhoArquivo) {
-    final arquivo = File(caminhoArquivo);
-
-    if (arquivo.existsSync()) {
-      String jsonContent = arquivo.readAsStringSync();
-      List<dynamic> livrosJson = jsonDecode(jsonContent)['livros'];
-
-      List<Livro> livros = [];
-
-      for (var livroJson in livrosJson) {
-        int id = livroJson['id'];
-        String titulo = livroJson['titulo'];
-        double preco = livroJson['preco'];
-        double estrelas = livroJson['estrelas'];
-        String autor = livroJson['autor'];
-        bool eFavorito = livroJson['favorito'];
-
-        Livro livro = Livro(id, titulo, preco, estrelas, autor, eFavorito);
-        livros.add(livro);
+  bool adicionarItemPorId(int id, List<Livro> livros) {
+    for (var livro in livros) {
+      if (livro.id == id) {
+        itens.add(livro);
+        return true;
       }
+    }
+    return false;
+  }
 
-      return livros;
+  bool adicionarItemPorNome(String nome, List<Livro> livros) {
+    for (var livro in livros) {
+      if (livro.titulo == nome) {
+        itens.add(livro);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool removerItem(int id, String nome) {
+    for (var livro in itens) {
+      if (livro.id == id || livro.titulo == nome) {
+        itens.remove(livro);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  void exibirCarrinho() {
+    if (itens.isEmpty) {
+      print("O carrinho está vazio.");
     } else {
-      throw Exception('O arquivo não foi encontrado.');
+      print("Itens no carrinho:");
+      for (var livro in itens) {
+        print("${livro.id}: ${livro.titulo}");
+      }
     }
   }
 }
 
 void main() {
   List<Livro> livros = Livro.lerLivrosJson('livraria.json');
+  Sacola sacola = Sacola();
 
-  for (var livro in livros) {
-    print('----------------------------');
-    print('ID: ${livro.id}');
-    print('Título: ${livro.titulo}');
-    print('Preço: ${livro.preco}');
-    print('Estrelas: ${livro.estrelas}');
-    print('Autor: ${livro.autor}');
-    print('Favorito: ${livro.eFavorito}');
-    print('----------------------------');
+  print("REMOVER LIVROS DO CARRINHO: ");
+
+  print("Digite o(s) ID(s) ou o(s) nome(s) do(s) livro(s) que deseja remover do carrinho separados por vírgula:\n");
+  var idNome = stdin.readLineSync() ?? "";
+
+  List<String> idsNomes = idNome.split(',');
+  bool livroRemovido = false;
+
+  for (var idNome in idsNomes) {
+    // Rastrear se o livro foi encontrado.
+    bool encontrado = false;
+
+    if (int.tryParse(idNome) != null) {
+      // Se for um ID, vai tentar remover pelo ID.
+      int id = int.parse(idNome);
+      if (sacola.removerItem(id, '')) {
+        livroRemovido = true;
+        encontrado = true;
+      }
+    } else {
+      // Se não for um ID, vai tentar remover pelo nome.
+      if (sacola.removerItem(0, idNome)) {
+        livroRemovido = true;
+        encontrado = true;
+      }
+    }
+
+    if (!encontrado) {
+      print("Livro não encontrado: $idNome");
+    }
+  }
+
+  // Exibe o carrinho após as operações.
+  sacola.exibirCarrinho();
+
+  // Verifica se algum livro foi removido.
+  if (livroRemovido) {
+    print("Livro(s) removido(s) do carrinho.");
+  } else {
+    print("Nenhum livro foi encontrado ou removido.");
   }
 }
