@@ -4,16 +4,25 @@ class Sacola {
   List<Livro> itens = [];
 
   bool adicionarItemPorId(int id, List<Livro> livros) {
+    // Verifica se o livro já está na sacola antes de adicionar.
+    if (itens.any((livro) => livro.id == id)) {
+      return false; // Livro já está na sacola.
+    }
+
     for (var livro in livros) {
       if (livro.id == id) {
         itens.add(livro);
         return true;
       }
     }
-    return false;
+    return false; // Livro não encontrado na lista de livros.
   }
 
   bool adicionarItemPorNome(String nome, List<Livro> livros) {
+    if (itens.any((livro) => livro.titulo == nome)) {
+      return false;
+    }
+
     for (var livro in livros) {
       if (livro.titulo == nome) {
         itens.add(livro);
@@ -24,6 +33,7 @@ class Sacola {
   }
 
   void listarItens() {
+    //isNotEmpty verifica se a lista itens não está vazia.
     if (itens.isNotEmpty) {
       for (var item in itens) {
         print("----------------------------");

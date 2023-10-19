@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'classLivraria.dart';
 
 void listarLivros(int controleLivros, List<Livro> livros) {
@@ -60,19 +61,46 @@ void listarLivros(int controleLivros, List<Livro> livros) {
 
       break;
     case 4:
-      print("\nLIVROS EM ORDEM AUFABETICA DE AUTORES: \n");
-      for (var i = 0; i < livros.length - 1; i++) {
-        for (var j = i + 1; j < livros.length; j++) {
-          if (livros[i].autor.compareTo(livros[j].autor) > 0) {
-            var inverte = livros[i];
-            livros[i] = livros[j];
-            livros[j] = inverte;
+      print("\nLIVROS POR AUTORES: \n");
+      // Lista para armazenar os nomes dos autores.
+      List<String> autorUnico = [];
+
+      for (var livro in livros) {
+        if (!autorUnico.contains(livro.autor)) {
+          autorUnico.add(livro.autor);
+        }
+      }
+
+      for (int i = 0; i < autorUnico.length - 1; i++) {
+        for (int j = i + 1; j < autorUnico.length; j++) {
+          if (autorUnico[i].compareTo(autorUnico[j]) > 0) {
+            String inverte = autorUnico[i];
+            autorUnico[i] = autorUnico[j];
+            autorUnico[j] = inverte;
           }
         }
       }
 
+      print("Autores disponíveis:");
+      print("--------------------------------");
+      for (var autor in autorUnico) {
+        print("${autor}\n");
+      }
+
+      stdout.write("Digite o nome do autor (da maneira como se encotra escrito) para ver seus livros cadastrados: ");
+      String nomeAutor = (stdin.readLineSync() ?? "").toLowerCase();
+
+      // Procura livros do autor selecionado e mostrar suas informações.
+      bool encontrouLivros = false;
       for (var livro in livros) {
-        livro.mostrarDetalhes();
+        if (livro.autor.toLowerCase() == nomeAutor) {
+          livro.mostrarDetalhes(); 
+          encontrouLivros = true;
+        }
+      }
+
+      if (!encontrouLivros) {
+        print("Não foram encontrados livros com a informação fornecida!");
       }
 
       break;
