@@ -1,9 +1,10 @@
-# exercicios--linguagem-dart
+# exercicios-linguagem-dart
 
-* Repositório de Exercicios para estudo da linguagem dart
+* Repositório de Exercicios do livro Fundamentos da programação de computadores feitos usando a linguagem Dart fins de estudo.
 
-* status do ultimo modulo feito: 
+* Progresso de desenvolvimento: 
 ```bash
-12 Finalizado!
+modulos Finalizados!
+Desafio Finalizado!
 ```
-* data da ultima atualização do repositório: 06/Out/2023
+* Data da ultima atualização do repositório: 19/Out/2023.
