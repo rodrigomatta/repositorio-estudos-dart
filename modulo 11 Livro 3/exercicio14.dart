@@ -13,14 +13,16 @@ Future<void> main() async {
 
     switch (escolha) {
       case (1):
-        String escola = "Numero,Nome,Nota1,Nota2\n";
         final arquivoEscola = File('escola.csv');
-        arquivoEscola.openSync();
-        arquivoEscola.writeAsStringSync('');
-        arquivoEscola.writeAsStringSync(escola,mode: FileMode.writeOnlyAppend);
-        print("arquivo criado com sucesso!");
+        if (!arquivoEscola.existsSync()) {
+          arquivoEscola.createSync();
+          arquivoEscola.writeAsStringSync('Numero,Nome,Nota1,Nota2\n');
+        } else {
+          print("O Arquivo já existe!.");
+        }
+        print("Arquivo criado com sucesso!");
 
-      break;
+        break;
       case (2):
         final arquivoEscola = File('escola.csv');
         arquivoEscola.openSync();
